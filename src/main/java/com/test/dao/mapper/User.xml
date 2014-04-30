@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.test.dao.mapper.IUserMapper">
+	
+	<select id="getUserById" parameterType="int" resultType="User">
+		select * from user where id = #{id}
+	</select>
+	
+	<resultMap type="User" id="userList"><!-- type为返回列表元素的类全名或别名 -->  
+    	<id column="id" property="id" />  
+    	<result column="name" property="name" />  
+    	<result column="age" property="age" />  
+    	<result column="address" property="address" />  
+	</resultMap>  
+  
+	<select id="getUsers" parameterType="string" resultMap="userList"><!-- resultMap为上面定义的User列表 -->  
+    	select * from user where name like #{name}  
+	</select>  
+	
+	<insert id="addUser" parameterType="User" useGeneratedKeys="true" keyProperty="id"><!-- useGeneratedKeys指定myBatis使用数据库自动生成的主键，并填充到keyProperty指定的属性上。如果未指定，返回对象拿不到生成的值 -->  
+    	insert into user(name,age,address) values(#{name},#{age},#{address})  
+	</insert> 
+	<update id="updateUser" parameterType="User">  
+    	update user set name=#{name}, age=#{age}, address=#{address}  
+    	where id=#{id}  
+	</update>  
+	<delete id="deleteUser" parameterType="int">  
+    	delete from `user` where id=#{id}  
+	</delete>
+	
+	
+	<resultMap type="com.test.domain.Article" id="articleList">  
+    	<id column="a_id" property="id" />  
+    	<result column="title" property="title" />  
+    	<result column="content" property="content" />  
+      	<!-- user属性映射到User类 --> 
+    	<association property="user" javaType="User"> 
+        	<id column="id" property="id" />  
+        	<result column="name" property="name" />  
+        	<result column="address" property="address" />  
+    	</association>  
+	</resultMap>  
+  
+<select id="getArticlesByUserId" parameterType="int" resultMap="articleList">  
+    select u.id, u.name, u.age, u.address, a.id a_id, a.title, a.content  
+    from article a  
+    inner join user u  
+    on a.user_id=u.id and u.id=#{id}  
+</select>  
+</mapper>
